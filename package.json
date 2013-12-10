@@ -1,12 +1,18 @@
 {
-  "name": "WebMatrixExpressSite",
-  "version": "0.2.0",
-  "author": "The WebMatrix Team <webmatrix@microsoft.com>",
-  "description": "A simple boilerplate for building node applications on Windows Azure (or wherever)",
+  "name": "deverything",
+  "version": "0.0.1",
+  "author": "Andrew Tobin <andrew@andrewtobin.org>",
+  "description": "",
   "contributors": [
+      { 
+      "name": "Andrew Tobin",
+      "email": "andrew@andrewtobin.org",
+          
+      },
     {
       "name": "Justin Beckwith",
-      "email": "justbe@microsoft.com"
+      "email": "justbe@microsoft.com",
+      "contributed": "Azure node.js template"
     }
   ],
   "main": "./server.js",
@@ -20,7 +26,6 @@
     "express": "~3.1.0"
   },
   "noAnalyze": true,
-  "license": "Apache",
   "engines": {
     "node": ">=0.6.14"
   }

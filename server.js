@@ -11,6 +11,8 @@ var express = require('express')
 
 var app = express();
 
+app.use(require('less-middleware')({ src: __dirname + '/public', compress: true, dest: __dirname + '/public/css/', prefix: '/css' }));
+
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
