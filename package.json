@@ -6,8 +6,7 @@
   "contributors": [
       { 
       "name": "Andrew Tobin",
-      "email": "andrew@andrewtobin.org",
-          
+      "email": "andrew@andrewtobin.org"
       },
     {
       "name": "Justin Beckwith",
@@ -23,7 +22,11 @@
   ],
   "dependencies": {
     "jade": "*",
-    "express": "~3.1.0"
+    "express": "~3.1.0",
+    "less-middleware": "*",
+    "mocha": "*",
+    "passport": "*",
+    "socket.io": "*"
   },
   "noAnalyze": true,
   "engines": {
