@@ -4,10 +4,10 @@
   "author": "Andrew Tobin <andrew@andrewtobin.org>",
   "description": "",
   "contributors": [
-      { 
+    {
       "name": "Andrew Tobin",
       "email": "andrew@andrewtobin.org"
-      },
+    },
     {
       "name": "Justin Beckwith",
       "email": "justbe@microsoft.com",
@@ -26,7 +26,12 @@
     "less-middleware": "*",
     "mocha": "*",
     "passport": "*",
-    "socket.io": "*"
+    "socket.io": "*",
+    "node-uuid": "~1.4.1",
+    "async": "~0.2.9",
+    "nconf": "~0.6.9",
+    "azure": "~0.7.18",
+    "cuid": "~1.2.1"
   },
   "noAnalyze": true,
   "engines": {
