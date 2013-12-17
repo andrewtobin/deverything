@@ -4,11 +4,31 @@
  */
 
 var express = require('express')
-  , http = require('http')
   , path = require('path')
+  , passport = require('passport')
+  , FacebookStrategy = require('passport-facebook').Strategy
   , sockets = require('./lib/sockets');     // WebSockets setup
 
-var azure = require('azure');
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(obj, done) {
+  done(null, obj);
+});
+
+passport.use(new FacebookStrategy({ 
+        clientID: process.env.FACEBOOKAPPID || 'xxxx',
+        clientSecret: process.env.FACEBOOKAPPSECRET || 'xxxx',
+        callbackUrl: 'http://localhost:3000/auth/facebook/callback'
+    },
+    function(accessToken, refreshToken, profile, done) {
+        process.nextTick(function() {
+            return done(null, profile);
+        });
+    }   
+));
+
 
 var app = express();
 
@@ -24,6 +44,8 @@ app.configure(function(){
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
+  app.use(passport.initialize());
+  app.use(passport.session());
   app.use(app.router);
   app.use(express.static(path.join(__dirname, 'public')));
 });
@@ -33,6 +55,28 @@ app.configure('development', function(){
 });
 
 RegisterApi(app, ['users']);
+
+app.get('/login', function(req, res) {
+    res.render('login', { user: req.user });
+});
+
+app.get('/auth/facebook',
+  passport.authenticate('facebook'),
+  function(req, res){
+    // The request will be redirected to Facebook for authentication, so this
+    // function will not be called.
+});
+
+app.get('/auth/facebook/callback', 
+  passport.authenticate('facebook', { failureRedirect: '/login' }),
+  function(req, res) {
+    res.redirect('/');
+});
+
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
+});
 
 sockets.server.listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
