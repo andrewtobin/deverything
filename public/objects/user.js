@@ -1,7 +1,7 @@
 'use strict';
 
 function User(options) {
-  return $.extend(this, { id: cuid(), name: '', email: '', alias: '' }, options);
+  return $.extend(this, { id: '', name: '', email: '', alias: '' }, options);
 }
 
 User.prototype.getGravatar = function() {
