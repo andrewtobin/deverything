@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('jobberApp', [
+angular.module('dev', [
   'ngCookies',
   'ngResource',
   'ngSanitize',
@@ -9,10 +9,64 @@ angular.module('jobberApp', [
   .config(function ($routeProvider) {
     $routeProvider
       .when('/', {
-        templateUrl: 'views/main.html',
+        templateUrl: '/main',
         controller: 'MainCtrl'
       })
       .otherwise({
         redirectTo: '/'
       });
   });
+
+angular.module('dev')
+    .directive('d3bars', function() {
+       return {
+           restrict: 'EA',
+           scope: {
+               data: '='
+           },
+           link: function(scope, element, attrs) {
+                var svg = d3.select(element[0])
+                            .append('svg')
+                            .style('width', '100%')
+                            .style('height', '200px');
+                     
+                window.onresize = function() {
+                    return scope.$apply();
+                };                     
+                     
+                scope.$watch(function() {
+                    return angular.element(window)[0].innerWidth;
+                }, function() {
+                    scope.render(scope.data);
+                });                     
+                            
+                scope.$watch('data', function(newVals, oldVals) {
+                    return scope.render(newVals);
+                }, true);                            
+                
+                scope.render = function(data) {
+                    console.log(data);
+                    svg.selectAll('*').remove();
+                    
+                    if(!data) return;
+                    
+                    svg.selectAll('rect')
+                        .data(data)
+                        .enter()
+                        .append('rect')
+                        .attr('class', 'bar')
+                        .attr('height', function(d) {
+                            return d * 15;
+                        })
+                        .attr('width', 20)
+                        .attr('x', function(d, i) {
+                            return i * (20 + 2);
+                        })
+                        .attr('y', function(d) {
+                            return 200 - d * 15;
+                        });
+                        
+                };
+           }
+       }; 
+    });
