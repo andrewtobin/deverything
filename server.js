@@ -68,7 +68,7 @@ new RegisterApi(app, ['users', 'projects', 'site']);
 passport.use(new FacebookStrategy({
         clientID: process.env.FACEBOOKAPPID || '187860668084745',
         clientSecret: process.env.FACEBOOKAPPSECRET || 'a73d528fab9a23d225a0949467594202',
-        callbackURL: 'https://deverything-c9-andrewtobin.c9.io/auth/facebook/callback'
+        callbackURL: process.env.FACEBOOKCALLBACK || 'https://deverything-c9-andrewtobin.c9.io/auth/facebook/callback'
     },
     function(accessToken, refreshToken, profile, done) {
         process.nextTick(function () {
