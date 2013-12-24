@@ -56,7 +56,7 @@ function RegisterApi(app, endpoints) {
         api.initialize(app.get('storageName'), app.get('storageKey'));
         
         app.get('/api/' + endpoint, ensureAuthenticated, api.findAll);
-        app.get('/api/' + endpoint + '/:id', api.findById);
+        app.get('/api/' + endpoint + '/:id', ensureAuthenticated, api.findById);
         app.post('/api/' + endpoint, api.add);
         app.put('/api/' + endpoint + '/:id', api.update);
         app.delete('/api/' + endpoint + '/:id', api.delete);
@@ -140,7 +140,7 @@ app.get('/', function (req, res) {
     if(req.user) {
         var token = jwt.encode({ user: req.user }, app.get('secret'));
         
-        t = { name: req.user.username, token: token };
+        t = { id: req.user.id, name: req.user.username, token: token };
     }
     
     res.render('index', { title : 'Home', user: t});
@@ -148,6 +148,10 @@ app.get('/', function (req, res) {
 
 app.get('/main', function (req, res) {
     res.render('partials/main', { title : 'Home', user: req.user });
+});
+
+app.get('/profile', function (req, res) {
+    res.render('partials/profile', { title : 'Profile', user: req.user });
 });
 
 // -- Starting the server
@@ -168,5 +172,5 @@ function ensureAuthenticated(req, res, next) {
         }
     }
     
-    res.redirect('/login');
+    res.redirect('/logout');
 }

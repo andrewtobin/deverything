@@ -12,6 +12,10 @@ angular.module('dev', [
         templateUrl: '/main',
         controller: 'MainCtrl'
       })
+      .when('/profile', {
+          templateUrl: '/profile',
+          controller: 'ProfileCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });
@@ -45,7 +49,6 @@ angular.module('dev')
                 }, true);                            
                 
                 scope.render = function(data) {
-                    console.log(data);
                     svg.selectAll('*').remove();
                     
                     if(!data) return;
