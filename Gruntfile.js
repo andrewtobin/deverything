@@ -1,7 +1,12 @@
 'use strict';
 
 module.exports = function (grunt) {
+    require('load-grunt-tasks')(grunt);
+    
     grunt.initConfig({
+        clean: {
+            server: '.tmp'
+        },
         jshint: {
             options: {
                 jshintrc: '.jshintrc',
@@ -12,23 +17,31 @@ module.exports = function (grunt) {
                 '{,*/}*.js'
             ]
         },
+        ngmin: {
+            dist: {
+                files: [{
+                    expand: true,
+                    cwd: 'web/scripts/',
+                    src: '**/*.js',
+                    dest: '.tmp/scripts'
+                }]
+            }
+        },
         uglify: {
             dist: {
                 files: {
-                    'public/scripts/scripts.js': [
-                        'public/bower_components/**/*.js',
-                        'public/objects/**/*.js'
+                    'public/hosted/scripts.js': [
+                        '.tmp/scripts/**/*.js'
                     ]
                 }
             }
         }
     });
 
-    grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-jshint');
-
     grunt.registerTask('default', [
-        'jshint'
-        //'uglify'
+        'clean:server',
+        'jshint',
+        'ngmin',
+        'uglify'
     ]);
 };

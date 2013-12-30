@@ -8,8 +8,9 @@ var express = require('express'),
   path = require('path'),
   passport = require('passport'),
   FacebookStrategy = require('passport-facebook').Strategy,
-  jwt = require("jwt-simple"),
-  sockets = require('./lib/sockets');     // WebSockets setup
+  jwt = require('jwt-simple'),
+  gravatar = require('gravatar'),
+  sockets = require('./server/sockets');     // WebSockets setup
 
 passport.serializeUser(function(user, done) {
     done(null, user);
@@ -23,13 +24,13 @@ var app = express();
 
 sockets.initialize(app);
 
-app.use(require('less-middleware')({ src: __dirname + '/public', compress: true, dest: __dirname + '/public/css/', prefix: '/css' }));
+app.use(require('less-middleware')({ src: __dirname + '/web/style', compress: true, dest: __dirname + '/public/hosted/', prefix: '/hosted' }));
 
 app.configure(function() {
     app.set('port', process.env.PORT || 3000);
     app.set('storageName', process.env.STORAGENAME || 'deverything');
     app.set('storageKey', process.env.STORAGEKEY || 'pXnjakIxmCE5cDN/NoXeNSmkpDbXTt4vjHpb8wShPa/01y5OSbwNzP0CK5bUB8jm59i1r7Ryq1j3x4khhUHIcw==');
-    app.set('views', __dirname + '/views');
+    app.set('views', __dirname + '/web/views');
     app.set('view engine', 'jade');
     app.set('secret', process.env.SECRET || 'deverything');
     app.use(express.favicon());
@@ -48,11 +49,27 @@ app.configure('development', function() {
     app.use(express.errorHandler());
 });
 
+
+function ensureAuthenticated(req, res, next) {
+    
+    console.log('-=> token: ' + req.headers.token);
+    
+    if(req.headers.token) {
+        var decoded = jwt.decode(req.headers.token, app.get('secret'));
+    
+        if (req.isAuthenticated() && decoded.user.username === req.user.username) {
+            return next();
+        }
+    }
+    
+    res.redirect('/logout');
+}
+
 function RegisterApi(app, endpoints) {
 
     // http://openmymind.net/2012/2/3/Node-Require-and-Exports/
     endpoints.forEach(function(endpoint) {
-        var api = require('./lib/controllers/' + endpoint);
+        var api = require('./server/controllers/' + endpoint);
         api.initialize(app.get('storageName'), app.get('storageKey'));
         
         app.get('/api/' + endpoint, ensureAuthenticated, api.findAll);
@@ -72,7 +89,7 @@ passport.use(new FacebookStrategy({
     },
     function(accessToken, refreshToken, profile, done) {
         process.nextTick(function () {
-            var api = require('./lib/controllers/users');
+            var api = require('./server/controllers/users');
             
             var addResult = {
                 send: function(r) {
@@ -140,7 +157,9 @@ app.get('/', function (req, res) {
     if(req.user) {
         var token = jwt.encode({ user: req.user }, app.get('secret'));
         
-        t = { id: req.user.id, name: req.user.username, token: token };
+        var url = gravatar.url(req.user.email, { r: 'pg', s: '50', d: 'mm' }, true);
+        
+        t = { id: req.user.id, name: req.user.username, gravatar: url, token: token };
     }
     
     res.render('index', { title : 'Home', user: t});
@@ -159,18 +178,3 @@ app.get('/profile', function (req, res) {
 sockets.server.listen(app.get('port'), function() {
     console.log('Express server listening on port ' + app.get('port'));
 });
-
-function ensureAuthenticated(req, res, next) {
-    
-    console.log('-=> token: ' + req.headers.token);
-    
-    if(req.headers.token) {
-        var decoded = jwt.decode(req.headers.token, app.get('secret'));
-    
-        if (req.isAuthenticated() && decoded.user.username == req.user.username) { 
-            return next(); 
-        }
-    }
-    
-    res.redirect('/logout');
-}
