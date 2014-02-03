@@ -1,4 +1,4 @@
-!!! 5
+doctype html
 | <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 | <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 | <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
@@ -11,7 +11,7 @@ head
     meta(name='viewport', content='width=device-width')
     | <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     link(rel='stylesheet', href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css")
-    link(rel='stylesheet', href='hosted/style.css')
+    link(rel='stylesheet', href='/style.css')
 body(ng-app='dev')
 
     | <!--[if lt IE 7]>
@@ -36,14 +36,14 @@ body(ng-app='dev')
                     span.icon-bar
                     span.icon-bar
                     span.icon-bar
-                a.navbar-brand(href='#') deverything
+                a.navbar-brand(href='#/') deverything
         
             div.navbar-collapse collapse
                 ul.nav.navbar-nav
                     li.active
-                        a(href='#') Home
+                        a(href='#/') Home
                     li
-                        a(href='#about') About
+                        a(href='#/about') About
                 ul.nav.navbar-nav.navbar-right
                     li
                         if user 
@@ -110,6 +110,6 @@ body(ng-app='dev')
         });
 
     | <!-- build:js({.tmp,app}) scripts/scripts.js -->
-    script(src='hosted/scripts.js') 
+    script(src='/scripts.js') 
     | <!-- endbuild -->
 | </html>

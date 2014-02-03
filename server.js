@@ -4,15 +4,17 @@
  * Module dependencies.
  */
 
-var express = require('express'),
-  path = require('path'),
-  passport = require('passport'),
+// load in libraries
+
+var express = require('express'),           // web server
+  path = require('path'),                   // File system library
+  passport = require('passport'),           // Passport = user authentication
   FacebookStrategy = require('passport-facebook').Strategy,
-  jwt = require('jwt-simple'),
-  gravatar = require('gravatar'),
+  jwt = require('jwt-simple'),              // JSON Web Tokens for API
+  gravatar = require('gravatar'),           // library to generate gravatar url
   sockets = require('./server/sockets');     // WebSockets setup
 
-passport.serializeUser(function(user, done) {
+passport.serializeUser(function(user, done) {       // tell Passport how to serialize and deserialize users
     done(null, user);
 });
 
@@ -20,19 +22,18 @@ passport.deserializeUser(function(obj, done) {
     done(null, obj);
 });
 
-var app = express();
+var app = express();        // instantiate web server
 
-sockets.initialize(app);
+sockets.initialize(app);    // tell the sockets library to base settings off web server
 
-app.use(require('less-middleware')({ src: __dirname + '/web/style', compress: true, dest: __dirname + '/public/hosted/', prefix: '/hosted' }));
-
+// configure web server
 app.configure(function() {
     app.set('port', process.env.PORT || 3000);
-    app.set('storageName', process.env.STORAGENAME || 'deverything');
+    app.set('storageName', process.env.STORAGENAME || 'deverything');   // Some environment keys for Azure web storage
     app.set('storageKey', process.env.STORAGEKEY || 'pXnjakIxmCE5cDN/NoXeNSmkpDbXTt4vjHpb8wShPa/01y5OSbwNzP0CK5bUB8jm59i1r7Ryq1j3x4khhUHIcw==');
-    app.set('views', __dirname + '/web/views');
-    app.set('view engine', 'jade');
-    app.set('secret', process.env.SECRET || 'deverything');
+    app.set('views', __dirname + '/web/views');                         // where to find the views (html)
+    app.set('view engine', 'jade');                                     // what the views are written in http://jade-lang.com/
+    app.set('secret', process.env.SECRET || 'deverything');             // the key to encode jwt
     app.use(express.favicon());
     app.use(express.logger('dev'));
     app.use(express.cookieParser());
@@ -42,7 +43,7 @@ app.configure(function() {
     app.use(passport.initialize());
     app.use(passport.session());
     app.use(app.router);
-    app.use(express.static(path.join(__dirname, 'public')));
+    app.use(express.static(path.join(__dirname, 'public')));            // which directory static files are hosted in
 });
 
 app.configure('development', function() {
@@ -50,14 +51,12 @@ app.configure('development', function() {
 });
 
 
-function ensureAuthenticated(req, res, next) {
+function ensureAuthenticated(req, res, next) {                          // middleware to make sure api calls are from an authenticated user
+
+    if(req.headers.token) {                                             // check a token was supplied
+        var decoded = jwt.decode(req.headers.token, app.get('secret')); // decode the passed in token using the key
     
-    console.log('-=> token: ' + req.headers.token);
-    
-    if(req.headers.token) {
-        var decoded = jwt.decode(req.headers.token, app.get('secret'));
-    
-        if (req.isAuthenticated() && decoded.user.username === req.user.username) {
+        if (req.isAuthenticated() && decoded.user.username === req.user.username) { // check the user in the token is the same as the requester
             return next();
         }
     }
@@ -65,7 +64,7 @@ function ensureAuthenticated(req, res, next) {
     res.redirect('/logout');
 }
 
-function RegisterApi(app, endpoints) {
+function RegisterApi(app, endpoints) {                                  // how the api endpoints are defined
 
     // http://openmymind.net/2012/2/3/Node-Require-and-Exports/
     endpoints.forEach(function(endpoint) {
@@ -80,101 +79,100 @@ function RegisterApi(app, endpoints) {
     });
 }
 
-new RegisterApi(app, ['users', 'projects', 'site']);
+new RegisterApi(app, ['users', 'projects', 'site']);                    // register the api endpoints
 
-passport.use(new FacebookStrategy({
+passport.use(new FacebookStrategy({                                     // set Passport to use Facebook for authentication
         clientID: process.env.FACEBOOKAPPID || '187860668084745',
         clientSecret: process.env.FACEBOOKAPPSECRET || 'a73d528fab9a23d225a0949467594202',
         callbackURL: process.env.FACEBOOKCALLBACK || 'https://deverything-c9-andrewtobin.c9.io/auth/facebook/callback'
     },
-    function(accessToken, refreshToken, profile, done) {
+    function(accessToken, refreshToken, profile, done) {                // if user tries to login
         process.nextTick(function () {
             var api = require('./server/controllers/users');
             
-            var addResult = {
+            var addResult = {                                           // method for adding the user result
                 send: function(r) {
-                    console.log(r);
-                    if(r.error) {
-                        return done(r.error);
+                    if(r.error) {                                       // if there was a problem with the api adding the user
+                        return done(r.error);                           // return the error
                     }
                     else {
-                        return done(null, r);
+                        return done(null, r);                           // otherwise return the user
                     }
                 }
             };
             
-            var findResult = {
+            var findResult = {                                              // method for user exists check result
                 send: function(r) {
-                    if(r.error) {
-                        if(r.error === 'User not found') {
+                    if(r.error) {                                           // if there's an error
+                        if(r.error === 'User not found') {                  // if not found create the user
                             api.add({ body: { id: profile.id, username: profile.username }}, addResult);
                         }
                         else {
-                            return done(r.error);
+                            return done(r.error);                           // otherwise return the error
                         }
                     }
                     else {
-                        return done(null, r);
+                        return done(null, r);                               // if found, return the user
                     }
                 }
             };
             
-            api.initialize(app.get('storageName'), app.get('storageKey'));
-            api.findById({ params: { id: profile.id }}, findResult);
+            api.initialize(app.get('storageName'), app.get('storageKey'));  // initialize Azure Storage
+            api.findById({ params: { id: profile.id }}, findResult);        // see if user exists
         });
     }
 ));
 
 // -- Passport routes
 
-app.get('/login', function(req, res) {
-    res.render('login', { user: req.user });
-});
-
-app.get('/auth/facebook',
+app.get('/auth/facebook',       // If user navigates to /auth/facebook the request is redirected
     passport.authenticate('facebook'),
     function() {
     // The request will be redirected to Facebook for authentication, so this
     // function will not be called.
 });
 
-app.get('/auth/facebook/callback',
+app.get('/auth/facebook/callback',  // Facebook returns to this url then the user is authenticated
     passport.authenticate('facebook', { failureRedirect: '/login' }),
     function(req, res) {
-        res.redirect('/');
+        res.redirect('/');          // redirected back to the main page
     });
 
-app.get('/logout', function(req, res) {
+app.get('/logout', function(req, res) { // The user is logged out of the site
     req.logout();
     res.redirect('/');
 });
 
 // -- Site content routes
 
-app.get('/', function (req, res) {
+app.get('/', function (req, res) {  // the route for the main page
     var t = null;
     
-    if(req.user) {
+    if(req.user) {      // if the user is logged in, then a jwt is generated for them as well
         var token = jwt.encode({ user: req.user }, app.get('secret'));
         
-        var url = gravatar.url(req.user.email, { r: 'pg', s: '50', d: 'mm' }, true);
+        var url = gravatar.url(req.user.email, { r: 'pg', s: '50', d: 'mm' }, true);  // gravatar url is created from the email
         
         t = { id: req.user.id, name: req.user.username, gravatar: url, token: token };
     }
     
-    res.render('index', { title : 'Home', user: t});
+    res.render('index', { title : 'Home', user: t});    // the index view is generated passing in the token/user object
 });
 
-app.get('/main', function (req, res) {
+app.get('/main', function (req, res) {              // the url for the "main" partial for the initial page loaded
     res.render('partials/main', { title : 'Home', user: req.user });
 });
 
-app.get('/profile', function (req, res) {
+app.get('/about', function (req, res) {              // the url for the "about" partial for the initial page loaded
+    res.render('partials/about', { title : 'About', user: req.user });
+});
+
+app.get('/profile', function (req, res) {           // the url for the "profile" partial
     res.render('partials/profile', { title : 'Profile', user: req.user });
 });
 
 // -- Starting the server
 
-sockets.server.listen(app.get('port'), function() {
+sockets.server.listen(app.get('port'), function() {     // tell Express and Web Sockets to start listening
     console.log('Express server listening on port ' + app.get('port'));
 });

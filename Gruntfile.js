@@ -4,9 +4,7 @@ module.exports = function (grunt) {
     require('load-grunt-tasks')(grunt);
     
     grunt.initConfig({
-        clean: {
-            server: '.tmp'
-        },
+        clean: ['.tmp', 'public/*.*'],
         jshint: {
             options: {
                 jshintrc: '.jshintrc',
@@ -16,6 +14,17 @@ module.exports = function (grunt) {
                 'Gruntfile.js',
                 '{,*/}*.js'
             ]
+        },
+        less: {
+            compile: {
+                options: {
+                    paths: ['web/style'],
+                    cleancss: true
+                },
+                files: {
+                    'public/style.css': 'web/style/style.less'
+                }
+            }
         },
         ngmin: {
             dist: {
@@ -30,7 +39,7 @@ module.exports = function (grunt) {
         uglify: {
             dist: {
                 files: {
-                    'public/hosted/scripts.js': [
+                    'public/scripts.js': [
                         '.tmp/scripts/**/*.js'
                     ]
                 }
@@ -39,8 +48,9 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('default', [
-        'clean:server',
+        'clean',
         'jshint',
+        'less',
         'ngmin',
         'uglify'
     ]);

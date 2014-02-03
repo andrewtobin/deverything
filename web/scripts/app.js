@@ -12,6 +12,10 @@ angular.module('dev', [
         templateUrl: '/main',
         controller: 'MainCtrl'
       })
+      .when('/about', {
+          templateUrl: '/about',
+          controller: 'AboutCtrl'
+      })
       .when('/profile', {
           templateUrl: '/profile',
           controller: 'ProfileCtrl'
