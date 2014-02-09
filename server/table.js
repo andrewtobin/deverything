@@ -32,6 +32,7 @@ Table.prototype = {
         var self = this;
         
         item.RowKey = item.id || cuid();
+        item.id = item.RowKey;
         item.PartitionKey = self.partitionKey;
         item.Deleted = false;
         
@@ -49,6 +50,7 @@ Table.prototype = {
         var self = this;
         
         item.RowKey = item.id || cuid();
+        item.id = item.RowKey;
         item.PartitionKey = key;
         item.Deleted = false;
         

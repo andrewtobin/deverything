@@ -32,28 +32,38 @@ form.form-horizontal(role='form', ng-show="screen === 'addproject'")
 div.container(ng-show="screen === 'project'")
     div.row
         div.col-md-12
-            h2 {{ selectedProject.name }}
+            h2(ng-click="projectScreen = 'main'") {{ selectedProject.name }}
     div.row.thumbnail(ng-repeat="t in tickets track by $index", ng-click="selectTicket(t)", ng-show="projectScreen === 'main'")
         div.col-md-offset-1.col-md-11
-            h3 {{ p.name }} 
-                small  {{ p.description }}
+            h3 {{ t.name }} 
+                small  {{ t.created | date:'short' }}
     div.row(ng-show="loggedin && projectScreen === 'main'")
         div.col-md-12
-            button.btn.btn-link(ng-click="projectScreen = 'addticket'") Add a new ticket...
-    form.form-horizontal(role='form', ng-show="projectScreen === 'addticket'")
+            button.btn.btn-link(ng-click="addTicket()") Add a new ticket...
+    form.form-horizontal(role='form', ng-show="projectScreen === 'ticket'")
         div.form-group
                 label.col-sm-2.control-label Name
                 div.col-sm-4
                     input.form-control(type='text', placeholder='Name', ng-model='ticket.name')
-        div.form-group
-                label.col-sm-2.control-label Description
+                label.col-sm-2.control-label Type
                 div.col-sm-4
-                    input.form-control(type='text', placeholder='Description', ng-model='ticket.description')
+                    select.form-control(ng-model='ticket.type')
+                        option(value="bug") Bug
+                        option(value="issue") Issue
+                        option(value="feature") Feature
+        div.form-group
+            div.col-sm-4
+                label Requested By: {{ ticket.creator.name }}
+        div.form-group
+            div.col-sm-4
+                label Details:
+        div.form-group
+            div.thumbnail#writeSurface(contenteditable="true", ng-model="ticket.description", ng-keyup="keyPressed($event)", ng-click="keyPressed(null)")
         div.form-group
             div.col-sm-offset-2.col-sm-3
-                button.btn.btn-primary(type='submit', ng-click='addTicket(ticket)') Submit                
+                button.btn.btn-primary(type='submit', ng-click='saveTicket()', ng-show="loggedin") Submit                
             div.col-sm-1
-                button.btn.btn-danger(ng-click="projectScreen = 'main'") Cancel
+                button.btn.btn-danger(ng-click="projectScreen = 'main'", ng-show="loggedin") Cancel
 
             
 script.

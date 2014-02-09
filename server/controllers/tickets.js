@@ -72,7 +72,7 @@ exports.update = function(req, res) {
     var id = req.params.id;
     var ticket = req.body;
 
-    service.find(azure.TableQuery.select().from(tablename).where('RowKey eq ?', id), function(err, items) {
+    service.find(azure.TableQuery.select().from(tablename).where('RowKey eq ?', ticket.RowKey).where('PartitionKey eq ?', ticket.project), function(err, items) {
         if(err) {
             res.send({'error': err});
         }
