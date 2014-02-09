@@ -30,7 +30,7 @@ sockets.initialize(app);    // tell the sockets library to base settings off web
 app.configure(function() {
     app.set('port', process.env.PORT || 3000);
     app.set('storageName', process.env.STORAGENAME || 'deverything');   // Some environment keys for Azure web storage
-    app.set('storageKey', process.env.STORAGEKEY || 'pXnjakIxmCE5cDN/NoXeNSmkpDbXTt4vjHpb8wShPa/01y5OSbwNzP0CK5bUB8jm59i1r7Ryq1j3x4khhUHIcw==');
+    app.set('storageKey', process.env.STORAGEKEY || 'FoBEeE/kdrc0wBh+kg2+ucrJwyx4U3tK+L3kw2fS8+srQekwiAsXdk4/uAALTVdx4OIJ+FSd9skqii085yWpbQ==');
     app.set('views', __dirname + '/web/views');                         // where to find the views (html)
     app.set('view engine', 'jade');                                     // what the views are written in http://jade-lang.com/
     app.set('secret', process.env.SECRET || 'deverything');             // the key to encode jwt
@@ -71,15 +71,15 @@ function RegisterApi(app, endpoints) {                                  // how t
         var api = require('./server/controllers/' + endpoint);
         api.initialize(app.get('storageName'), app.get('storageKey'));
         
-        app.get('/api/' + endpoint, ensureAuthenticated, api.findAll);
+        app.get('/api/' + endpoint, api.findAll);
         app.get('/api/' + endpoint + '/:id', ensureAuthenticated, api.findById);
-        app.post('/api/' + endpoint, api.add);
-        app.put('/api/' + endpoint + '/:id', api.update);
-        app.delete('/api/' + endpoint + '/:id', api.delete);
+        app.post('/api/' + endpoint, ensureAuthenticated, api.add);
+        app.put('/api/' + endpoint + '/:id', ensureAuthenticated, api.update);
+        app.delete('/api/' + endpoint + '/:id', ensureAuthenticated, api.delete);
     });
 }
 
-new RegisterApi(app, ['users', 'projects', 'site']);                    // register the api endpoints
+new RegisterApi(app, ['users', 'projects', 'tickets']);                    // register the api endpoints
 
 passport.use(new FacebookStrategy({                                     // set Passport to use Facebook for authentication
         clientID: process.env.FACEBOOKAPPID || '187860668084745',
@@ -151,7 +151,7 @@ app.get('/', function (req, res) {  // the route for the main page
     if(req.user) {      // if the user is logged in, then a jwt is generated for them as well
         var token = jwt.encode({ user: req.user }, app.get('secret'));
         
-        var url = gravatar.url(req.user.email, { r: 'pg', s: '50', d: 'mm' }, true);  // gravatar url is created from the email
+        var url = gravatar.url(req.user.email || req.connection.remoteAddress, { r: 'pg', s: '50', d: 'mm' }, true);  // gravatar url is created from the email
         
         t = { id: req.user.id, name: req.user.username, gravatar: url, token: token };
     }

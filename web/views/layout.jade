@@ -40,9 +40,9 @@ body(ng-app='dev')
         
             div.navbar-collapse collapse
                 ul.nav.navbar-nav
-                    li.active
+                    li#home
                         a(href='#/') Home
-                    li
+                    li#about
                         a(href='#/about') About
                 ul.nav.navbar-nav.navbar-right
                     li
@@ -110,6 +110,6 @@ body(ng-app='dev')
         });
 
     | <!-- build:js({.tmp,app}) scripts/scripts.js -->
-    script(src='/scripts.js') 
+    script(src='/scripts.js?1') 
     | <!-- endbuild -->
 | </html>

@@ -5,3 +5,14 @@ p This application is a framework for job ticketing that was developed as a part
 p It was built by Andrew Tobin and lives on 
   a(href="https://github.com/andrewtobin/deverything") Github.
 
+p Frameworks, libraries, sites and tools used in the creation of this include:
+
+ul
+    li(ng-repeat="c in components")
+        div 
+            a(ng-href="{{ c.url }}") {{ c.name }}
+            {{ ' ' + c.description }}
+
+script.
+    $('.active').removeClass('active');
+    $('#about').addClass('active');

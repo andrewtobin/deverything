@@ -1,19 +1,61 @@
-div.jumbotron
+div.jumbotron(ng-show="screen !== 'project'")
     h1 Welcome to deverything
     p An all-in-one development ticketing and management toolset.
-    
-div.container
+
+div.container(ng-show="screen === 'main'")
     div.row
-        div.col-md-4
-            h2 Projects
-            div.thumbnail
-                p Open projects on deverything.
-                d3bars(data='projects')
-        div.col-md-4
-            h2 My Tickets
-            div.thumbnail
-                p Tickets logged for you in the system.
-        div.col-md-4
-            h2 Latest Updates
-            div.thumbnail
-                p All the information that has happened on deverything.
+        div.col-md-12
+            h2 Projects ({{ projects.length }})
+    div.row.thumbnail(ng-repeat="p in projects track by $index", ng-click="selectProject(p)")
+        div.col-md-offset-1.col-md-11
+            h3 {{ p.name }} 
+                small  {{ p.description }}
+    div.row(ng-show="loggedin")
+        div.col-md-12
+            button.btn.btn-link(ng-click="screen = 'addproject'") Add a new project...
+
+form.form-horizontal(role='form', ng-show="screen === 'addproject'")
+    div.form-group
+            label.col-sm-2.control-label Name
+            div.col-sm-4
+                input.form-control(type='text', placeholder='Name', ng-model='project.name')
+    div.form-group
+            label.col-sm-2.control-label Description
+            div.col-sm-4
+                input.form-control(type='text', placeholder='Description', ng-model='project.description')
+    div.form-group
+        div.col-sm-offset-2.col-sm-3
+            button.btn.btn-primary(type='submit', ng-click='addProject(project)') Submit                
+        div.col-sm-1
+            button.btn.btn-danger(ng-click="screen = 'main'") Cancel
+
+div.container(ng-show="screen === 'project'")
+    div.row
+        div.col-md-12
+            h2 {{ selectedProject.name }}
+    div.row.thumbnail(ng-repeat="t in tickets track by $index", ng-click="selectTicket(t)", ng-show="projectScreen === 'main'")
+        div.col-md-offset-1.col-md-11
+            h3 {{ p.name }} 
+                small  {{ p.description }}
+    div.row(ng-show="loggedin && projectScreen === 'main'")
+        div.col-md-12
+            button.btn.btn-link(ng-click="projectScreen = 'addticket'") Add a new ticket...
+    form.form-horizontal(role='form', ng-show="projectScreen === 'addticket'")
+        div.form-group
+                label.col-sm-2.control-label Name
+                div.col-sm-4
+                    input.form-control(type='text', placeholder='Name', ng-model='ticket.name')
+        div.form-group
+                label.col-sm-2.control-label Description
+                div.col-sm-4
+                    input.form-control(type='text', placeholder='Description', ng-model='ticket.description')
+        div.form-group
+            div.col-sm-offset-2.col-sm-3
+                button.btn.btn-primary(type='submit', ng-click='addTicket(ticket)') Submit                
+            div.col-sm-1
+                button.btn.btn-danger(ng-click="projectScreen = 'main'") Cancel
+
+            
+script.
+    $('.active').removeClass('active');
+    $('#home').addClass('active');
