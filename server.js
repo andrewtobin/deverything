@@ -151,7 +151,7 @@ app.get('/', function (req, res) {  // the route for the main page
     if(req.user) {      // if the user is logged in, then a jwt is generated for them as well
         var token = jwt.encode({ user: req.user }, app.get('secret'));
         
-        var url = gravatar.url(req.user.email || req.connection.remoteAddress, { r: 'pg', s: '50', d: 'mm' }, true);  // gravatar url is created from the email
+        var url = gravatar.url(req.user.email || req.connection.remoteAddress || 'none', { r: 'pg', s: '50', d: 'mm' }, true);  // gravatar url is created from the email
         
         t = { id: req.user.id, name: req.user.username, gravatar: url, token: token };
     }
