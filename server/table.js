@@ -44,6 +44,23 @@ Table.prototype = {
             }
         });
     },
+
+    addItemWithPartitionKey: function(item, key, callback) {
+        var self = this;
+        
+        item.RowKey = item.id || cuid();
+        item.PartitionKey = key;
+        item.Deleted = false;
+        
+        self.storageClient.insertEntity(self.tableName, item, function(err) {
+            if(err) {
+                callback(err);
+            }
+            else {
+                callback(null);
+            }
+        });
+    },
     
     updateItem: function(item, callback) {
         var self = this;

@@ -4,8 +4,10 @@ angular.module('dev')
   .controller('MainCtrl', function ($scope, $http) {
     $scope.screen = 'main';
     $scope.projects = [];
-    $scope.selectedProject = null;
     $scope.loggedin = false;
+
+    $scope.selectedProject = null;
+    $scope.tickets = [];
 
     var token = localStorage['deverything'];
 
@@ -31,7 +33,8 @@ angular.module('dev')
     });
 
     $scope.addProject = function(project) {
-        if(project === null || project.name === null || project.name === '') return;
+        if(project === null) return;
+        if(project.name === null || project.name === '') return;
         
         project = $.extend(project, { creator: { id: user.id, name: user.name, gravatar: user.gravatar }});
 
@@ -51,6 +54,17 @@ angular.module('dev')
         $scope.selectedProject = project;
         $scope.screen = 'project';
         $scope.projectScreen = 'main';
+        
+        console.log(project);
+        
+        $http({ method: 'GET', url: '/api/tickets/' + project.RowKey })
+            .success(function(data, status, headers, config) {
+                $scope.tickets = data;
+                console.log(data);
+            })
+            .error(function(data, status, headers, config) {
+                console.log(data);
+            });
     };
   });
   

@@ -32,7 +32,7 @@ exports.findById = function(req, res) {
         }
         else {
             if(items.length < 1) {
-                res.send({'error':'User not found'});
+                res.send(404, 'User not found');
             }
             else {
                 res.send(items[0]);

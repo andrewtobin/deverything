@@ -27,25 +27,26 @@ exports.findAll = function(req, res) {
 exports.findById = function(req, res) {
     var id = req.params.id;
     
-    service.find(azure.TableQuery.select().from(tablename).where('RowKey eq ?', id), function(err, items) {
+    service.find(azure.TableQuery.select().from(tablename).where('PartitionKey eq ?', id), function(err, items) {
         if(err) {
             res.send({'error':'An error has occurred'});
         }
         else {
             if(items.length < 1) {
-                res.send({'error':'Ticket not found'});
+                res.send(404, 'Project not found');
             }
             else {
-                res.send(items[0]);
+                res.send(items);
             }
         }
     });
 };
 
+
 exports.add = function(req, res) {
     var ticket = req.body;
     
-    service.find(azure.TableQuery.select().from(tablename).where('name eq ?', ticket), function(err, items) {
+    service.find(azure.TableQuery.select().from(tablename).where('name eq ?', ticket.name), function(err, items) {
         if(err) {
             res.send({'error':'An error has occurred'});
         }
@@ -54,7 +55,7 @@ exports.add = function(req, res) {
                 res.send({'error':'Ticket already exists'});
             }
             else {
-                service.addItem(ticket, function(err) {
+                service.addItemWithPartitionKey(ticket, ticket.project, function(err) {
                     if (err) {
                         res.send({'error':'An error has occurred'});
                     } else {

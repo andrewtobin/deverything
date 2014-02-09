@@ -72,7 +72,7 @@ function RegisterApi(app, endpoints) {                                  // how t
         api.initialize(app.get('storageName'), app.get('storageKey'));
         
         app.get('/api/' + endpoint, api.findAll);
-        app.get('/api/' + endpoint + '/:id', ensureAuthenticated, api.findById);
+        app.get('/api/' + endpoint + '/:id', api.findById);
         app.post('/api/' + endpoint, ensureAuthenticated, api.add);
         app.put('/api/' + endpoint + '/:id', ensureAuthenticated, api.update);
         app.delete('/api/' + endpoint + '/:id', ensureAuthenticated, api.delete);
