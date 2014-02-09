@@ -15,6 +15,8 @@ angular.module('dev')
 
         var user = JSON.parse(localStorage['deverything']);
       
+        console.log(user);
+      
         $http({ method: 'GET', url: '/api/users/' + user.id, headers: { 'token': user.token }})
             .success(function(data, status, headers, config) {
                 $scope.user = data;
