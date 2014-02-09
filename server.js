@@ -29,8 +29,8 @@ sockets.initialize(app);    // tell the sockets library to base settings off web
 // configure web server
 app.configure(function() {
     app.set('port', process.env.PORT || 3000);
-    app.set('storageName', process.env.STORAGENAME || 'devstores');   // Some environment keys for Azure web storage
-    app.set('storageKey', process.env.STORAGEKEY || 'qC/WQuB2g3cX6kAbL6WI/10RwNbYe140nzHHuZ/gy4g8gsonoK74ou6O6CgwyZYp4KzPP1KadizQJ9cI5aA1PA==');
+    app.set('storageName', process.env.STORAGENAME || 'deverything');   // Some environment keys for Azure web storage
+    app.set('storageKey', process.env.STORAGEKEY || 'Ny2yPHn3wW0ie2tsLmyUr1tPWJFvNPJi4kEJqvJ0/Jdt0UxKp7avU7N1B+ilgrvENi/m2Jzbk0swnMSeZRVjjQ==');
     app.set('views', __dirname + '/web/views');                         // where to find the views (html)
     app.set('view engine', 'jade');                                     // what the views are written in http://jade-lang.com/
     app.set('secret', process.env.SECRET || 'deverything');             // the key to encode jwt
